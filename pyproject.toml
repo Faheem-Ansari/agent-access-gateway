@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-access-gateway"
+version = "0.1.0"
+description = "Least-privilege, auditable tool access for AI agents, as an MCP server."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [{ name = "Faheem Ansari" }]
+dependencies = ["mcp>=2.3,<3"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+agent-access-gateway = "agent_access_gateway.server:main"
+aag = "agent_access_gateway.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_access_gateway"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]

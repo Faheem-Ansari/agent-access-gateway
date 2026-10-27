@@ -1,0 +1,57 @@
+# Demo access policy. Tokens are stored only as SHA-256 hashes.
+# Order of evaluation: deny wins, then needs_approval, then allow.
+# Anything not listed is denied.
+
+[agents.research-bot]
+description = "Reads documentation to answer questions. Never touches secrets."
+token_sha256 = "23269a108db41b22b357ddf8b3e66a6075832284ecd3105b6a5e39949b179df4"   # demo token: demo-research-token
+
+[[agents.research-bot.rules]]
+tool = "list_files"
+resource = "*"
+effect = "allow"
+
+[[agents.research-bot.rules]]
+tool = "read_file"
+resource = "docs/*"
+effect = "allow"
+reason = "Research agents may read documentation."
+
+[[agents.research-bot.rules]]
+tool = "get_secret"
+resource = "*"
+effect = "deny"
+reason = "Research agents never receive credentials."
+
+[agents.deploy-bot]
+description = "Ships services. Staging is automatic; production needs a person."
+token_sha256 = "8554e520137f6f2a62cd963eb47adfafef86a5980b92e7209f2dc8d42e822084"   # demo token: demo-deploy-token
+
+[[agents.deploy-bot.rules]]
+tool = "deploy"
+resource = "staging/*"
+effect = "allow"
+reason = "Staging deployments are low risk."
+
+[[agents.deploy-bot.rules]]
+tool = "deploy"
+resource = "production/*"
+effect = "needs_approval"
+reason = "Production changes need a person's approval."
+
+[[agents.deploy-bot.rules]]
+tool = "get_secret"
+resource = "secrets/staging-*"
+effect = "allow"
+reason = "Deploy agents may use staging credentials."
+
+[[agents.deploy-bot.rules]]
+tool = "get_secret"
+resource = "secrets/prod-*"
+effect = "needs_approval"
+reason = "Production credentials are released only with approval."
+
+[[agents.deploy-bot.rules]]
+tool = "read_file"
+resource = "reports/*"
+effect = "allow"
